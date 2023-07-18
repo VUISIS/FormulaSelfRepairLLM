@@ -1,0 +1,12 @@
+[
+    {
+        "instruction": "What is the solution to this model?",
+        "input": "domain Chewy { Shy ::= new (w: Integer, Right: Integer). Piquant ::= (w: Integer, Right: Integer). Livid ::= (Integer, Integer). Livid(w, Right) :- Shy(w, Right), c = count({ t | t is Piquant, t.w <= t.Right}), c > -31. Piquant(w, Right) :- Shy(w, Right). Piquant(Right, w) :- Piquant(w, Right), w > Right. conforms Livid(a, b). } partial model plasticWrap of Chewy { Shy(a, b). }, Shy(0, 0), Piquant(0, 0), Livid(0, 0)",
+        "output": "This model is solvable because of the conformity of the following rules [Livid(a, b)].\nA solution exists for these constraints:\n\nLivid(w, Right) -> [Shy(w, Right), c = count({ t | t is Piquant, t.w <= t.Right}), c > -31]\nPiquant(w, Right) -> [Shy(w, Right)]\nPiquant(Right, w) -> [Piquant(w, Right), w > Right]\n"
+    },
+    {
+        "instruction": "Given a formula file, why is it solvable?",
+        "input": "domain Sparse { Knurled ::= new (w: Integer, Antique: Integer). Smoky ::= (w: Integer, Antique: Integer). emeraldTabby ::= (Integer, Integer). emeraldTabby(w, Antique) :- Knurled(w, Antique), c = count({ t | t is Smoky, t.w <= t.Antique}), c <= 10. Smoky(w, Antique) :- Knurled(w, Antique). Smoky(Antique, w) :- Smoky(w, Antique), w > Antique. conforms emeraldTabby(a, b). } partial model Binding of Sparse { Knurled(a, b). }, Knurled(0, 0), Smoky(0, 0), emeraldTabby(0, 0)",
+        "output": "This model is solvable because of the conformity of the following rules [emeraldTabby(a, b)].\nA solution exists for these constraints:\n\nemeraldTabby(w, Antique) -> [Knurled(w, Antique), c = count({ t | t is Smoky, t.w <= t.Antique}), c <= 10]\nSmoky(w, Antique) -> [Knurled(w, Antique)]\nSmoky(Antique, w) -> [Smoky(w, Antique), w > Antique]\n"
+    }
+]

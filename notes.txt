@@ -1,0 +1,82 @@
+Sample formula query description:
+
+"""
+This is a Formula querying tool. Use this tool to query your loaded FORMULA code
+Use this tool by invoking it with a just a singular FORMULA query.
+
+
+Below, delimited by ```, is an example of some command commands that you can use.
+```
+solve pm 1 Mapping.conforms // Try to complete the partial model named pm
+ex 0 1 out.4ml // Extract and print the 1st solution from solve task 0
+query m badMapping // Does model m have a badMapping?
+list // lists out all tasks
+pr 0 //Show a proof for task 0
+help //displays available commands
+```
+
+Below, delimited by ``` is an example of our query program being ran and a sample output from this query program.
+
+```
+[]> solve pm 1 Mapping.conforms
+Parsing text took: 0
+Visiting text took: 0
+Started solve task with Id 0.
+0.06s.
+[]> list
+
+Environment variables
+
+Programs in file root
+ +-- /
+   | tmp_file.4ml
+
+Programs in env root
+ +-- /
+
+All tasks
+ Id | Kind  | Status | Result |      Started      | Duration
+----|-------|--------|--------|-------------------|----------
+ 0  | Solve |  Done  |  true  | 7/14/2023 3:13 PM |  0.48s
+0.02s.
+[]> ex 0 1 out.4ml
+Solution number 1
+Processor(0)
+Component(0, 1/16)
+Component(1, 1/16)
+Mapping(Component(0, 1/16), Processor(0))
+Mapping(Component(1, 1/16), Processor(0))
+
+
+0.01s.
+```
+The above queries where ran for the following code delimited by ```:
+
+```
+domain Mapping
+{
+  Component ::= new (id: Integer, utilization: Real).
+  Processor ::= new (id: Integer).
+  Mapping   ::= new (c: Component, p: Processor).
+
+  // The utilization must be > 0
+  invalidUtilization :- c is Component, c.utilization <= 0.
+
+  badMapping :- p is Processor,
+    s = sum(0.0, { c.utilization |
+              c is Component, Mapping(c, p) }), s > 100.
+
+  conforms no badMapping, no invalidUtilization.
+}
+
+
+partial model pm of Mapping
+{
+  c1 is Component(0, x).
+  c2 is Component(1, y).
+  p1 is Processor(0).
+  Mapping(c1, p1).
+  Mapping(c2, p1).
+}
+```
+"""
