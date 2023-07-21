@@ -4,14 +4,13 @@ domain Mapping
   Processor ::= new (id: Integer).
   Mapping   ::= new (c: Component, p: Processor).
 
-  // The utilization must be > 0
-  invalidUtilization1 :- c is Component, c.utilization <= 0.
+  invalidUtilization2 :- c is Component, c.utilization > 0.
 
   badMapping :- p is Processor,
     s = sum(0.0, { c.utilization |
               c is Component, Mapping(c, p) }), s > 100.
 
-  conforms no badMapping, no invalidUtilization1.
+  conforms no badMapping, no invalidUtilization2.
 }
 
 partial model pm of Mapping

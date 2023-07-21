@@ -1,0 +1,4 @@
+cfg = {
+	"OPENAI_API_KEY" : "",
+	"ACTIVELOOP_TOKEN" : "(OPTIONAL)"
+}

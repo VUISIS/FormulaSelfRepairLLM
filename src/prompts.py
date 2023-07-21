@@ -1,5 +1,9 @@
 FIX_CODE_PREFIX =  """ \
-You are an agent designed to read, write, execute, and more importantly fix and be able to execute FORMULA code.
+
+SYSTEM MESSAGE:
+
+You are an agent designed to read, write, execute, and more importantly fix and \
+be able to execute FORMULA code.
 
 Formula a novel formal specification language based on open-world logic programs
 and behavioral types. Its goals are (1) succinct specifications of domain-specific abstractions
@@ -15,14 +19,21 @@ If you get an error, debug your code and try again.
 You might know the answer without running any code, but you should still run the code to get the answer.
 If it does not seem like you can write code to answer the question, just return "I don't know" as the answer.
 
-FORMULA code may be broken when their are constraints that are conflicting with each other, for example there
-is one constraint that states x < 0 and x > 0, which would make it impossible for a possible x to exist. Your goal
-is given the code is first try to understand what is the code doing, and what each model and statement is asking for.
-Then after that you are tasked to figure out given the error messages given by the FORMULA interpreter to figure out
-what are some of the possible statements that might be broken, after that your next goal is to fix those broken parts of the code. After that you have to load the code into FORMULA using the load formula code tool, then after that you
-are tasked with querying the formula code using the query formula code tool. Inspect the results, if no error message
-comes out then you are finished and respond with what you have found, but if an error message comes out then restart
-your progress and further debug the code.
+FORMULA code may be broken when their are constraints that are conflicting with each other, for example there \
+is one constraint that states x < 0 and x > 0, which would make it impossible for a possible x to exist. Your first goal \
+is given the code try to understand what is the code doing. You can do this by envoking the decode formula code tool. \
+
+Then after that you are tasked to figure out given the error messages given by the FORMULA interpreter to figure out \
+what are some of the possible statements that might be broken, after that your next goal is to fix those broken parts of the code. \
+
+After that you have to load the code into FORMULA using the load formula code tool, then after that you \
+are tasked with querying the formula code using the query formula code tool. Inspect the results, if no error message \
+comes out then you are finished and respond with what you have found, but if an error message comes out then restart \
+your progress and further debug the code. \
+
+END OF SYSTEM MESSAGE
+
+
 """
 
 LOAD_FORMULA_CODE = """ \
@@ -49,6 +60,7 @@ help //displays available commands
 
 DECODE_FORMULA_CODE_LLM_DESC = """ \
 This is a Formula decoding tool. Use this tool to decode your FORMULA code into a natural language description.
+Make sure to use this tool before trying to fix the code, as you need to figure out what the code does first.
 """
 
 DECODE_FORMULA_CODE_LLM_PROMPT = """ \
@@ -56,4 +68,88 @@ Please decode the following FORMULA code delimited by ``` into a natural languag
 ```
 {code}
 ```
+"""
+
+QUERY_PROMPT = """ \
+Can you explain why the following code delimited in ``` is not solvable?
+Could you then try to fix the code?
+
+Here is the code:
+```
+{code}
+```
+
+And here is what the FORMULA interpreter says:
+
+```
+{interpreter_output}
+```
+"""
+
+SAMPLE_QUERY = """\
+
+Can you explain why the following code delimited in ``` is not solvable?
+Could you then try to fix the code?
+
+Here is the code:
+```
+domain Mapping
+{
+  Component ::= new (id: Integer, utilization: Real).
+  Processor ::= new (id: Integer).
+  Mapping   ::= new (c: Component, p: Processor).
+
+  // The utilization must be > 0
+  invalidUtilization1 :- c is Component, c.utilization <= 0.
+  invalidUtilization2 :- c is Component, c.utilization > 0.
+
+  badMapping :- p is Processor,
+    s = sum(0.0, { c.utilization |
+              c is Component, Mapping(c, p) }), s > 100.
+
+  conforms no badMapping, no invalidUtilization1, no invalidUtilization2.
+}
+
+partial model pm of Mapping
+{
+  c1 is Component(0, x).
+  c2 is Component(1, y).
+  p1 is Processor(0).
+  Mapping(c1, p1).
+  Mapping(c2, p1).
+}
+```
+
+And here is what the FORMULA interpreter says:
+
+```
+[]> solve pm 1 Mapping.conforms
+Parsing text took: 1
+Visiting text took: 0
+Started solve task with Id 0.
+0.06s.
+[]> ls
+
+Environment variables
+
+Programs in file root
+ +-- /
+ | tmp_file.4ml
+
+Programs in env root
+ +-- /
+
+All tasks
+ Id | Kind  | Status | Result |      Started      | Duration
+----|-------|--------|--------|-------------------|----------
+ 0  | Solve |  Done  | false  | 7/14/2023 3:44 PM |  0.28s
+0.02s.
+[]> ex 0 1 out.4ml
+Model not solvable. Unsat core terms below.
+Conflicts: Mapping.invalidUtilization2
+Conflicts: Mapping.invalidUtilization1
+
+0.01s.
+```
+
 """

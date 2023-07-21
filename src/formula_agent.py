@@ -21,27 +21,65 @@ from langchain.schema.messages import SystemMessage
 from langchain.tools.python.tool import PythonREPLTool
 from langchain.memory import ConversationBufferMemory
 from formula_tools import LoadFormulaCode, QueryFormulaCode, DecodeFormulaCodeLLM
+from langchain.experimental.plan_and_execute import PlanAndExecute, load_agent_executor, load_chat_planner
 from config import cfg
-from prompts import FIX_CODE_PREFIX
+from memory import SingletonMemory
+from prompts import FIX_CODE_PREFIX, SAMPLE_QUERY
+from langchain.callbacks.base import BaseCallbackHandler
 
 os.environ["OPENAI_API_KEY"] = cfg["OPENAI_API_KEY"]
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "http://localhost:1984"
 
+# class MyCustomHandler(BaseCallbackHandler):
+#     def on_llm_new_token(self, token: str, **kwargs) -> None:
+#         # print(f"My custom handler, token: {token}")
+#         pass
 
 
-# chat = ChatOpenAI(temperature=0.0)
-llm = ChatOpenAI(model="gpt-3.5-turbo-0613", temperature=0)
+# llm = ChatOpenAI(temperature=0.0, streaming=True, callbacks=[MyCustomHandler()])
+llm = ChatOpenAI(temperature=0)
 embeddings = OpenAIEmbeddings()
 
 
 
 system_message = SystemMessage(content=FIX_CODE_PREFIX)
 _prompt = OpenAIFunctionsAgent.create_prompt(system_message=system_message)
-memory = ConversationBufferMemory(memory_key="memory", return_messages=True)
+memory = SingletonMemory().get_memory()
 
-tools = [LoadFormulaCode(), QueryFormulaCode(), DecodeFormulaCodeLLM(llm=llm, memory=memory)]
+# ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+
+tools = [LoadFormulaCode, QueryFormulaCode, DecodeFormulaCodeLLM(llm=llm)]
+
+# planner = load_chat_planner(llm)
+
+# executor = load_agent_executor(llm, tools, verbose=True)
+# agent = PlanAndExecute(planner=planner, executor=executor, verbose=True)
+
+# agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True, memory=memory )
+
+
+# suffix = """Begin!"
+
+# {chat_history}
+# Question: {input}
+# {agent_scratchpad}"""
+
+# prompt = ZeroShotAgent.create_prompt(
+#     tools,
+#     prefix=FIX_CODE_PREFIX,
+#     suffix=suffix,
+#     input_variables=["input", "chat_history", "agent_scratchpad"],
+# )
+# memory = ConversationBufferMemory(memory_key="chat_history")
+# llm_chain = LLMChain(llm=llm, prompt=prompt)
+# _agent = ZeroShotAgent(llm_chain=llm_chain, tools=tools, verbose=True)
+# agent = AgentExecutor.from_agent_and_tools(
+#     agent=_agent, tools=tools, verbose=True, memory=memory
+# )
+
+# agent.run(input=SAMPLE_QUERY)
 
 agent = OpenAIFunctionsAgent(
     llm=llm,
@@ -57,72 +95,8 @@ agent_executor = AgentExecutor.from_agent_and_tools(
         verbose=True,
     )
 
-sample_query = """\
+# code =
 
-Can you explain why the following code delimited in ``` is not solvable?
-Could you then try to fix the code?
+agent_executor.run(SAMPLE_QUERY)
 
-Here is the code:
-```
-domain Mapping
-{
-  Component ::= new (id: Integer, utilization: Real).
-  Processor ::= new (id: Integer).
-  Mapping   ::= new (c: Component, p: Processor).
 
-  // The utilization must be > 0
-  invalidUtilization1 :- c is Component, c.utilization <= 0.
-  invalidUtilization2 :- c is Component, c.utilization > 0.
-
-  badMapping :- p is Processor,
-    s = sum(0.0, { c.utilization |
-              c is Component, Mapping(c, p) }), s > 100.
-
-  conforms no badMapping, no invalidUtilization1, no invalidUtilization2.
-}
-
-partial model pm of Mapping
-{
-  c1 is Component(0, x).
-  c2 is Component(1, y).
-  p1 is Processor(0).
-  Mapping(c1, p1).
-  Mapping(c2, p1).
-}
-```
-
-And here is what the FORMULA interpreter says:
-
-```
-[]> solve pm 1 Mapping.conforms
-Parsing text took: 1
-Visiting text took: 0
-Started solve task with Id 0.
-0.06s.
-[]> ls
-
-Environment variables
-
-Programs in file root
- +-- /
- | tmp_file.4ml
-
-Programs in env root
- +-- /
-
-All tasks
- Id | Kind  | Status | Result |      Started      | Duration
-----|-------|--------|--------|-------------------|----------
- 0  | Solve |  Done  | false  | 7/14/2023 3:44 PM |  0.28s
-0.02s.
-[]> ex 0 1 out.4ml
-Model not solvable. Unsat core terms below.
-Conflicts: Mapping.invalidUtilization2
-Conflicts: Mapping.invalidUtilization1
-
-0.01s.
-```
-
-"""
-
-agent_executor.run(sample_query)

@@ -5,6 +5,8 @@ from os.path import abspath
 from langchain.callbacks.manager import (
     CallbackManagerForToolRun,
 )
+from langchain.chat_models.base import BaseChatModel
+
 from pydantic import (
     BaseModel,
     Extra,
@@ -15,10 +17,18 @@ from pydantic import (
 )
 from langchain.tools.base import BaseTool
 from langchain.utilities import PythonREPL
-from prompts import LOAD_FORMULA_CODE, QUERY_FORUMULA_CODE
+from prompts import (
+    DECODE_FORMULA_CODE_LLM_DESC,
+    LOAD_FORMULA_CODE,
+    QUERY_FORUMULA_CODE,
+    DECODE_FORMULA_CODE_LLM_PROMPT,
+)
 import os
 from pythonnet import load
-
+from langchain.memory import ConversationBufferMemory
+from langchain import LLMChain, PromptTemplate
+from langchain.tools import BaseTool, StructuredTool, Tool, tool
+from memory import SingletonMemory
 
 load("coreclr", runtime_config=os.path.abspath("../runtimeconfig.json"))
 import clr
@@ -46,59 +56,95 @@ if not ci.DoCommand("unload *"):
     raise Exception("Unload command failed.")
 
 
-class LoadFormulaCode(BaseTool):
-    """A tool for running python code in a REPL."""
+def _LoadFormulaCode(query: str):
+    """Use the tool."""
 
-    name = "LoadFormulaCode"
-    description = LOAD_FORMULA_CODE
+    # Put the query string into a file ./temp.4ml
+    with open("./temp.4ml", "w") as f:
+        f.write(query)
 
-    def _run(
-        self,
-        query: str,
-        run_manager: Optional[CallbackManagerForToolRun] = None,
-    ) -> Any:
-        """Use the tool."""
+    # Load the file into the FORMULA program
+    if not ci.DoCommand("load ./temp.4ml"):
+        raise Exception("Load command failed.")
 
-        # Put the query string into a file ./temp.4ml
-        with open("./temp.4ml", "w") as f:
-            f.write(query)
-
-        # Load the file into the FORMULA program
-        if not ci.DoCommand("load ./temp.4ml"):
-            raise Exception("Load command failed.")
-
-        return "Successfully loaded FORMULA code, you can now query the code using the query formula code tool."
+    return "Successfully loaded FORMULA code, you can now query the code using the query formula code tool."
 
 
-class QueryFormulaCode(BaseTool):
-    """A tool for querying FORMULA code"""
-
-    name = "QueryFormulaCode"
-    description = QUERY_FORUMULA_CODE
+LoadFormulaCode = Tool.from_function(
+    func=_LoadFormulaCode, name="LoadFormulaCode", description=LOAD_FORMULA_CODE
+)
 
 
-    def _run(
-        self,
-        query: str,
-        run_manager: Optional[CallbackManagerForToolRun] = None,
-    ) -> Any:
-        sw.GetStringBuilder().Clear()
-        if not ci.DoCommand(query):
-            raise Exception("Query command failed.")
+# class QueryFormulaCode(BaseTool):
+#     """A tool for querying FORMULA code"""
 
-        return sw.ToString()
+#     name = "QueryFormulaCode"
+#     description = QUERY_FORUMULA_CODE
+
+#     def _run(
+#         self,
+#         query: str,
+#         run_manager: Optional[CallbackManagerForToolRun] = None,
+#     ) -> Any:
+#         sw.GetStringBuilder().Clear()
+#         if not ci.DoCommand(query):
+#             raise Exception("Query command failed.")
+
+#         return sw.ToString()
+
+
+def _QueryFormulaCode(query: str):
+    """Use the tool."""
+
+    sw.GetStringBuilder().Clear()
+    if not ci.DoCommand(query):
+        raise Exception("Query command failed.")
+
+    return sw.ToString()
+
+
+QueryFormulaCode = Tool.from_function(
+    func=_QueryFormulaCode, name="QueryFormulaCode", description=QUERY_FORUMULA_CODE
+)
+
 
 class DecodeFormulaCodeLLM(BaseTool):
     """A tool for querying FORMULA code"""
 
     name = "DecodeFormulaCodeLLM"
-    description = QUERY_FORUMULA_CODE
-    llm = Field()
-    memory = Field()
+    description = DECODE_FORMULA_CODE_LLM_DESC
+    llm: BaseChatModel
+    # memory: ConversationBufferMemory
 
     def _run(
         self,
         query: str,
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> Any:
-        pass
+        # template = """You are a chatbot trying to fix the code from the human.
+
+        # {chat_history}
+        # Human: {human_input}
+        # Chatbot:"""
+
+        # prompt = PromptTemplate(
+        #     input_variables=["chat_history", "human_input"], template=template
+        # )
+
+        # memory = ConversationBufferMemory(memory_key="chat_history")
+        # llm_chain = LLMChain(
+        #     llm=self.llm,
+        #     # memory=self.memory,
+        #     prompt="You are a chatbot trying to fix the code from the human.",
+        #     verbose=True,
+        # )
+        # return llm_chain.predict(
+        #     human_input=DECODE_FORMULA_CODE_LLM_PROMPT.format(code=query)
+        # )
+        print(SingletonMemory().get_memory())
+        return self.llm.predict(DECODE_FORMULA_CODE_LLM_PROMPT.format(code=query))
+
+    async def _arun(
+        self,
+    ):
+        raise NotImplementedError("custom_search does not support async")
