@@ -1,23 +1,58 @@
-domain Mapping
+domain Battery
 {
-  Component ::= new (id: Integer, utilization: Real).
-  Processor ::= new (id: Integer).
-  Mapping   ::= new (c: Component, p: Processor).
+  Component ::= new (label : String, weight : Real).
+  Battery ::= new (label : String, weight : Real, capacity : Real).
 
-  invalidUtilization2 :- c is Component, c.utilization > 0.
+  // Energy consumption rate
+  rate ::= (Real).
 
-  badMapping :- p is Processor,
-    s = sum(0.0, { c.utilization |
-              c is Component, Mapping(c, p) }), s > 100.
+  // Duration to complete the MissionItem with the given name
+  itemDuration ::= (String, Real).
 
-  conforms no badMapping, no invalidUtilization2.
+  // Amount of energy consumed to carry out the Mission with given name
+  itemConsumption ::= (String, Real).
+
+  // Total battery capacity
+  batteryCapacity ::= (Real).
+
+  // (x,y) location of the drone
+  Loc ::= new (x : Real, y : Real).
+
+  // Each mission item involves moving from source to destination locs at given velocity
+  MissionItem ::= new (label : String, src : Loc, dest : Loc, dist : Real, vel : Real).
+
+  // Each mission is a list of mission items
+  Mission ::= new (m : MissionItem, remainder : any Mission + {NIL}).
+
+  batteryCapacity(c) :- Battery(_, _, c).
+
+  itemDuration(name, t) :- MissionItem(name, _, _, dist, vel), t = dist/vel.
+
+  itemConsumption(name, c) :- MissionItem(name, _, _, _, _),
+    itemDuration(name, t1),
+    c = t1.
+    insufficientBattery :- itemConsumption(_, x), batteryCapacity(c), x > c.
+    conforms no insufficientBattery.
 }
 
-partial model pm of Mapping
+partial model pm of Battery
 {
-  c1 is Component(0, x).
-  c2 is Component(1, y).
-  p1 is Processor(0).
-  Mapping(c1, p1).
-  Mapping(c2, p1).
+  Component("payload1", 5).
+  Component("payload2", 3).
+  Component("body", 10).
+
+  // Battery capacity is symbolic
+  Battery("battery1", 5, 10).
+
+  l1 is Loc(40.00, 5.00).
+  l2 is Loc(47.00, 8.00).
+  l3 is Loc(52.00, 2.00).
+
+  t1 is MissionItem("task1", Loc(40.00, 5.00), Loc(47.00, 8.00), 7.62, 0.04).
+  t2 is MissionItem("task2", Loc(47.00, 8.00), Loc(52.00, 2.00), 7.81, 0.04).
+
+  m2 is Mission(t2, NIL).
+  m1 is Mission(t1, m2).
+
+  // rate = (225.4)/2.1 = 107.33
 }

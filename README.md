@@ -5,9 +5,8 @@ This repo attempts to use langchain and FORMULA such that you can feed into the 
 ## How to use
 
 1. Install all the dependencies
-	openai
-	langchain
-	
+	pip3 install openai langchain
+
 2. Copy and paste the compiled CommandLine FORMULA program into the CommandLine Folder
 	- this folder should contain the following files:
 		- Antlr4.Runtime.Standard.dll

@@ -59,9 +59,24 @@ help //displays available commands
 """
 
 DECODE_FORMULA_CODE_LLM_DESC = """ \
-This is a Formula decoding tool. Use this tool to decode your FORMULA code into a natural language description.
-Make sure to use this tool before trying to fix the code, as you need to figure out what the code does first.
+This is a Formula Decoding Tool. Use this tool to decode what the FORMULA code does, then further \
+this tool will identify where are the issues are in the code, and it would generate possible solutions \
+to fix the code.
+
+Make sure to use this tool before trying to fix the code, as you need to figure out what the code does first \
+and think up of different ways we can try to fix the code.
+
+To invoke this tool, make sure you call it in a JSON format in the following format:
+
+{
+	"code": "FORMULA CODE HERE",
+    "interpreter_output": "FORMULA INTERPRETER OUTPUT HERE",
+}
+
+Make sure you only call this function with a JSON format, otherwise it will not work.
+And make sure you include both the formula code and the formula interpreter output.
 """
+
 
 DECODE_FORMULA_CODE_LLM_PROMPT = """ \
 Please decode the following FORMULA code delimited by ``` into a natural language description.
@@ -69,6 +84,23 @@ Please decode the following FORMULA code delimited by ``` into a natural languag
 {code}
 ```
 """
+
+DEBUG_FORMULA_CODE_LLM_DESC = """ \
+This is a Formula debugging Tool. Use this tool to debugging your FORMULA code.
+This tool is most useful when you are trying to generate a new FORMULA code, but your code \
+is not able to get loaded because of a syntax error.
+
+To invoke this tool, make sure you call it in a JSON format in the following format:
+
+{
+	"code": "FORMULA CODE HERE",
+    "interpreter_output": "FORMULA INTERPRETER OUTPUT HERE",
+}
+
+Make sure you only call this function with a JSON format, otherwise it will not work.
+And make sure you include both the formula code and the formula interpreter output.
+"""
+
 
 QUERY_PROMPT = """ \
 Can you explain why the following code delimited in ``` is not solvable?
@@ -84,6 +116,11 @@ And here is what the FORMULA interpreter says:
 ```
 {interpreter_output}
 ```
+
+Here are some additional details to keep in mind when trying to figure out what is wrong with the code:
+
+{additional_details}
+
 """
 
 SAMPLE_QUERY = """\
@@ -120,7 +157,7 @@ partial model pm of Mapping
 }
 ```
 
-And here is what the FORMULA interpreter says:
+And here is what the FORMULA interpreter output is:
 
 ```
 []> solve pm 1 Mapping.conforms
@@ -153,3 +190,4 @@ Conflicts: Mapping.invalidUtilization1
 ```
 
 """
+
