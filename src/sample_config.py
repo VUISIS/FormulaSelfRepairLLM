@@ -1,5 +1,5 @@
 cfg = {
 	"OPENAI_API_KEY" : "",
 	"ACTIVELOOP_TOKEN" : "(OPTIONAL)",
-	"LANGCHAIN_API_KEY" : ""
+	"LANGCHAIN_API_KEY" : "(OPTIONAL)"
 }
