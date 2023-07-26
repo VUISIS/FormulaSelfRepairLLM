@@ -33,7 +33,7 @@ os.environ["OPENAI_API_KEY"] = cfg["OPENAI_API_KEY"]
 
 os.environ["LANGCHAIN_TRACING_V2"] ="true"
 os.environ["LANGCHAIN_ENDPOINT"] ="https://api.smith.langchain.com"
-os.environ["LANGCHAIN_API_KEY"] ="ls__fec7ca51f9324ee4b3708d40bcc82ffd"
+os.environ["LANGCHAIN_API_KEY"] = cfg["LANGCHAIN_API_KEY"]
 os.environ["LANGCHAIN_PROJECT"] ="pt-oily-sultan-99"
 
 # class MyCustomHandler(BaseCallbackHandler):
