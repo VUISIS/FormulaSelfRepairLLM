@@ -1,3 +1,6 @@
+# READ https://platform.openai.com/docs/guides/fine-tuning
+# This file is for converting training.json to a format that can be used for fine-tuning
+
 from config import cfg
 import json
 

@@ -28,28 +28,15 @@ from langchain.callbacks.base import BaseCallbackHandler
 
 os.environ["OPENAI_API_KEY"] = cfg["OPENAI_API_KEY"]
 
-# os.environ["LANGCHAIN_TRACING_V2"] = "true"
-# os.environ["LANGCHAIN_ENDPOINT"] = "http://localhost:1984"
 
-os.environ["LANGCHAIN_TRACING_V2"] ="true"
-os.environ["LANGCHAIN_ENDPOINT"] ="https://api.smith.langchain.com"
-os.environ["LANGCHAIN_API_KEY"] = cfg["LANGCHAIN_API_KEY"]
-os.environ["LANGCHAIN_PROJECT"] ="pt-oily-sultan-99"
-
-# class MyCustomHandler(BaseCallbackHandler):
-#     def on_llm_new_token(self, token: str, **kwargs) -> None:
-#         # print(f"My custom handler, token: {token}")
-#         pass
+if cfg["LANGCHAIN_API_KEY"] != "":
+	os.environ["LANGCHAIN_TRACING_V2"] ="true"
+	os.environ["LANGCHAIN_ENDPOINT"] ="https://api.smith.langchain.com"
+	os.environ["LANGCHAIN_API_KEY"] = cfg["LANGCHAIN_API_KEY"]
+	os.environ["LANGCHAIN_PROJECT"] ="pt-oily-sultan-99"
 
 
-# llm = ChatOpenAI(temperature=0.0, streaming=True, callbacks=[MyCustomHandler()])
 llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-16k")
-# llm = ChatOpenAI( model="gpt-3.5-turbo-16k")
-
-# llm = ChatOpenAI(model="gpt-4", temperature=0)
-
-embeddings = OpenAIEmbeddings()
-
 
 
 system_message = SystemMessage(content=FIX_CODE_PREFIX)
@@ -57,35 +44,6 @@ _prompt = OpenAIFunctionsAgent.create_prompt(system_message=system_message)
 memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
 tools = [LoadFormulaCode, QueryFormulaCode, DecodeFormulaCodeLLM(llm=llm), DebugFormulaCodeLLM(llm=llm)]
-
-# planner = load_chat_planner(llm)
-
-# executor = load_agent_executor(llm, tools, verbose=True)
-# agent = PlanAndExecute(planner=planner, executor=executor, verbose=True)
-
-# agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True, memory=memory )
-
-
-# suffix = """Begin!"
-
-# {chat_history}
-# Question: {input}
-# {agent_scratchpad}"""
-
-# prompt = ZeroShotAgent.create_prompt(
-#     tools,
-#     prefix=FIX_CODE_PREFIX,
-#     suffix=suffix,
-#     input_variables=["input", "chat_history", "agent_scratchpad"],
-# )
-# memory = ConversationBufferMemory(memory_key="chat_history")
-# llm_chain = LLMChain(llm=llm, prompt=prompt)
-# _agent = ZeroShotAgent(llm_chain=llm_chain, tools=tools, verbose=True)
-# agent = AgentExecutor.from_agent_and_tools(
-#     agent=_agent, tools=tools, verbose=True, memory=memory
-# )
-
-# agent.run(input=SAMPLE_QUERY)
 
 agent = OpenAIFunctionsAgent(
     llm=llm,
@@ -194,5 +152,6 @@ The model is trying to model a battery in a drone nad figure out how far we can 
 It seems to be having trouble with the battery capacity, if we could help use some type of symbolic value for the battery capacity, that would be great.
 """
 
-agent_executor.run(QUERY_PROMPT.format(code=code, interpreter_output=interpreter_output, additional_details=additional_details))
-# agent_executor.run(SAMPLE_QUERY)
+# agent_executor.run(QUERY_PROMPT.format(code=code, interpreter_output=interpreter_output, additional_details=additional_details))
+if __name__ == "__main__":
+	agent_executor.run(SAMPLE_QUERY)
