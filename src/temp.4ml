@@ -1,25 +1,19 @@
-domain Mapping
+domain RecursionExample
 {
-  Component ::= new (id: Integer, utilization: Real).
-  Processor ::= new (id: Integer).
-  Mapping   ::= new (c: Component, p: Processor).
+  A ::= new (x : Integer).
 
-  // The utilization must be > 0
-  invalidUtilization1 :- c is Component, c.utilization <= 0.
-  invalidUtilization2 :- c is Component, c.utilization > 0.
+  // Recursively derive new A's
+  A(y) :- A(x), x < 0, y = x - 1.
+  A(y) :- A(x), x >= 0.
 
-  badMapping :- p is Processor,
-    s = sum(0.0, { c.utilization |
-              c is Component, Mapping(c, p) }), s > 100, s <= 100.
+  // A model is good if it contains exactly 2 A's
+  goodModel :- c = count({ a | a is A}), c = 2.
 
-  conforms no badMapping, no invalidUtilization1, no invalidUtilization2.
+  conforms goodModel.
 }
 
-partial model pm of Mapping
+partial model pm of RecursionExample
+[solver_RecursionBound = 20]
 {
-  c1 is Component(0, 0.5).
-  c2 is Component(1, 0.8).
-  p1 is Processor(0).
-  Mapping(c1, p1).
-  Mapping(c2, p1).
+  A(x).
 }
