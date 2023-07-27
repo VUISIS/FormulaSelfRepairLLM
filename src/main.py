@@ -1,5 +1,5 @@
 import argparse
-# from formula_agent import agent_executor
+from formula_agent import agent_executor
 from prompts import QUERY_PROMPT
 
 def read_file_content(file_path):
@@ -38,6 +38,14 @@ out what is wrong with the code:\n\n{args.additional_details}"
 
     agent_executor.run(query)
     # print(query)
+
+def run_agent_executor(code, output, additional_details):
+    query = QUERY_PROMPT.format(code=code, interpreter_output=output)
+    if additional_details:
+        query += f"\n\nHere are some additional details to keep in mind when trying to figure \
+out what is wrong with the code:\n\n{additional_details}"
+
+    agent_executor.run(query)
 
 if __name__ == "__main__":
     main()
