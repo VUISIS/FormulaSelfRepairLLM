@@ -50,7 +50,7 @@ In this repository, there are 4 main tools in use:
 
 ## Future Work
 
-Moving forward, there are several avenues for enhancing the capabilities of the self-repairing FORMULA LLM model. One crucial aspect is fine-tuning the model, especially for specific tasks related to describing how the code works. The challenge lies in obtaining a high-quality training dataset. To address this, one potential approach is to leverage the power of GPT by using it to generate diverse formula codes and then deliberately breaking the generated code. Trying to deliberately break the generated code could be done with seeking additional code-breaking assistance from GPT. What we have tried to some success is introducing random mutations into the Antlr AST parsing tree and observing the code's behavior.
+Moving forward, there are several avenues for enhancing the capabilities of the self-repairing FORMULA LLM model. One crucial aspect is fine-tuning the model, especially for specific tasks related to describing how the code works. The challenge lies in obtaining a high-quality training dataset. To address this, one potential approach is to leverage the power of GPT by using it to generate diverse formula codes and then deliberately break the generated code. Trying to deliberately break the generated code could be done by seeking additional code-breaking assistance from GPT. What we have tried to some success is introducing random mutations into the Antlr AST parsing tree and observing the code's behavior.
 
 Another promising direction is injecting the model with more context about FORMULA and its workings. Fine-tuning the LLM with various examples of functioning FORMULA code could lead to more accurate and informed code repairs. Additionally, refining the prompts and engineering them to align better with GPT's understanding can improve the model's performance significantly.
 
@@ -58,4 +58,22 @@ Exploring alternative large language models, such as GPT-4, is also worth consid
 
 To address potential issues with infinite loops and repetitive behavior in code-fixing attempts, implementing a more robust memory system and introducing early stoppage mechanisms could be valuable. These measures would prevent excessive calls to the OpenAI API and improve overall efficiency.
 
-Utilizing Large Language Model Technology to create self repairing modules for different code bases can end up becoming a very innovation new tool to help software developers speed up the time they spend debugging.
+Utilizing Large Language Model Technology to create self-repairing modules for different code bases can end up becoming a very innovative new tool to help software developers speed up the time they spend debugging.
+
+## Resources
+
+
+[https://python.langchain.com/docs/get_started/introduction
+](https://python.langchain.com/docs/get_started/introduction
+)
+
+[https://www.deeplearning.ai/short-courses/langchain-for-llm-application-development/
+](https://www.deeplearning.ai/short-courses/langchain-for-llm-application-development/)
+
+[https://python.langchain.com/docs/modules/chains/foundational/sequential_chains
+](https://python.langchain.com/docs/modules/chains/foundational/sequential_chains
+)
+
+[https://python.langchain.com/docs/modules/memory/agent_with_memory](https://python.langchain.com/docs/modules/agents/how_to/add_memory_openai_functions)
+
+[https://python.langchain.com/docs/modules/agents/agent_types/openai_functions_agent](https://python.langchain.com/docs/modules/agents/agent_types/openai_functions_agent)
