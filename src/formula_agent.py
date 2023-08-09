@@ -20,10 +20,10 @@ from langchain.schema.language_model import BaseLanguageModel
 from langchain.schema.messages import SystemMessage
 from langchain.tools.python.tool import PythonREPLTool
 from langchain.memory import ConversationBufferMemory
-from formula_tools import DebugFormulaCodeLLM, LoadFormulaCode, QueryFormulaCode, DecodeFormulaCodeLLM
+from .formula_tools import DebugFormulaCodeLLM, LoadFormulaCode, QueryFormulaCode, DecodeFormulaCodeLLM
 from langchain.experimental.plan_and_execute import PlanAndExecute, load_agent_executor, load_chat_planner
-from config import cfg
-from prompts import FIX_CODE_PREFIX, QUERY_PROMPT, SAMPLE_QUERY
+from .config import cfg
+from .prompts import FIX_CODE_PREFIX, QUERY_PROMPT, SAMPLE_QUERY
 from langchain.callbacks.base import BaseCallbackHandler
 
 os.environ["OPENAI_API_KEY"] = cfg["OPENAI_API_KEY"]

@@ -9,7 +9,7 @@ from langchain.chat_models.base import BaseChatModel
 from langchain.chains import SequentialChain
 from langchain.tools.base import BaseTool
 from langchain.utilities import PythonREPL
-from prompts import (
+from .prompts import (
     DEBUG_FORMULA_CODE_LLM_DESC,
     DEBUG_FORMULA_CODE_LLM_PROMPT,
     DEBUG_FORMULA_CODE_LLM_RETURN,
@@ -28,12 +28,14 @@ from langchain import LLMChain, PromptTemplate
 from langchain.tools import BaseTool, StructuredTool, Tool, tool
 import json
 
-load("coreclr", runtime_config=os.path.abspath("../runtimeconfig.json"))
-import clr
+env4ml = os.environ.get("FORMULA_KERNEL", "1")
+if env4ml == "1":
+    load("coreclr", runtime_config=os.path.abspath("../runtimeconfig.json"))
+    import clr
 
-process_path = abspath("../CommandLine/CommandLine.dll")
+    process_path = abspath("../CommandLine/CommandLine.dll")
 
-clr.AddReference(os.path.abspath(process_path))
+    clr.AddReference(os.path.abspath(process_path))
 
 from Microsoft.Formula.CommandLine import CommandInterface, CommandLineProgram
 from System.IO import StringWriter
