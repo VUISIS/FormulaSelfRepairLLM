@@ -4,6 +4,9 @@ version = "0.1.0"
 description = "Language model to fix broken FORMULA code"
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
+packages = [{include = "main", from="src"}]
+include = ["CommandLine/*"]
+
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
