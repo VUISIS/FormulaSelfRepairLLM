@@ -1,0 +1,27 @@
+[]> solve pm 1 Mapping.conforms
+Parsing text took: 1
+Visiting text took: 0
+Started solve task with Id 0.
+0.06s.
+[]> ls
+
+Environment variables
+
+Programs in file root
+ +-- /
+ | tmp_file.4ml
+
+Programs in env root
+ +-- /
+
+All tasks
+ Id | Kind  | Status | Result |      Started      | Duration
+----|-------|--------|--------|-------------------|----------
+ 0  | Solve |  Done  | false  | 7/14/2023 3:44 PM |  0.28s
+0.02s.
+[]> ex 0 1 out.4ml
+Model not solvable. Unsat core terms below.
+Conflicts: Mapping.invalidUtilization2
+Conflicts: Mapping.invalidUtilization1
+
+0.01s.

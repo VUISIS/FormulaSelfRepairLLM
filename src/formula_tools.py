@@ -9,7 +9,7 @@ from langchain.chat_models.base import BaseChatModel
 from langchain.chains import SequentialChain
 from langchain.tools.base import BaseTool
 from langchain.utilities import PythonREPL
-from .prompts import (
+from prompts import (
     DEBUG_FORMULA_CODE_LLM_DESC,
     DEBUG_FORMULA_CODE_LLM_PROMPT,
     DEBUG_FORMULA_CODE_LLM_RETURN,
