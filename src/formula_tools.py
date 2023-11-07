@@ -42,7 +42,7 @@ if env4ml == "1":
         process_path = abspath("../CommandLine/CommandLine.dll")
     else:
         # handle linux 
-        process_path = abspath("../CommandLine/CommandLine.dll")
+        process_path = abspath("~/.dotnet/tools/.store/vuisis.formula/1.0.0/vuisis.formula/1.0.0/tools/net6.0/any/VUISIS.Formula.dll")
 
     clr.AddReference(os.path.abspath(process_path))
 
