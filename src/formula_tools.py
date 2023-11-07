@@ -22,6 +22,7 @@ from prompts import (
     DECODE_FORMULA_CODE_LLM_PROMPT,
 )
 import os
+from sys import platform 
 from pythonnet import load
 from langchain.memory import ConversationBufferMemory
 from langchain import LLMChain, PromptTemplate
@@ -33,7 +34,15 @@ if env4ml == "1":
     load("coreclr", runtime_config=os.path.abspath("../runtimeconfig.json"))
     import clr
 
-    process_path = abspath("../CommandLine/CommandLine.dll")
+    if platform.startswith("win"):
+        # handle windows
+        process_path = abspath("../CommandLine/CommandLine.dll")
+    elif platform.startswith("darwin"):
+        # handle macos
+        process_path = abspath("../CommandLine/CommandLine.dll")
+    else:
+        # handle linux 
+        process_path = abspath("../CommandLine/CommandLine.dll")
 
     clr.AddReference(os.path.abspath(process_path))
 
