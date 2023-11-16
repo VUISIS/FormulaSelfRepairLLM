@@ -9,7 +9,7 @@ from langchain.chat_models.base import BaseChatModel
 from langchain.chains import SequentialChain
 from langchain.tools.base import BaseTool
 from langchain.utilities import PythonREPL
-from .prompts import (
+from prompts import (
     DEBUG_FORMULA_CODE_LLM_DESC,
     DEBUG_FORMULA_CODE_LLM_PROMPT,
     DEBUG_FORMULA_CODE_LLM_RETURN,
@@ -22,6 +22,7 @@ from .prompts import (
     DECODE_FORMULA_CODE_LLM_PROMPT,
 )
 import os
+from sys import platform 
 from pythonnet import load
 from langchain.memory import ConversationBufferMemory
 from langchain import LLMChain, PromptTemplate
@@ -33,7 +34,15 @@ if env4ml == "1":
     load("coreclr", runtime_config=os.path.abspath("../runtimeconfig.json"))
     import clr
 
-    process_path = abspath("../CommandLine/CommandLine.dll")
+    if platform.startswith("win"):
+        # handle windows
+        process_path = abspath("../CommandLine/CommandLine.dll")
+    elif platform.startswith("darwin"):
+        # handle macos
+        process_path = abspath("../CommandLine/CommandLine.dll")
+    else:
+        # handle linux 
+        process_path = abspath("~/.dotnet/tools/.store/vuisis.formula/1.0.0/vuisis.formula/1.0.0/tools/net6.0/any/VUISIS.Formula.dll")
 
     clr.AddReference(os.path.abspath(process_path))
 

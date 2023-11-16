@@ -1,6 +1,6 @@
 import argparse
-from .formula_agent import agent_executor
-from .prompts import QUERY_PROMPT
+from formula_agent import agent_executor
+from prompts import QUERY_PROMPT
 
 def read_file_content(file_path):
     with open(file_path, 'r') as file:

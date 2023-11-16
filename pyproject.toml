@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "formulaselfrepairllm"
+version = "0.1.0"
+description = "Language model to fix broken FORMULA code"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "src"}]
+include = ["CommandLine/*"]
+
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+openai = "^0.28.1"
+langchain = "^0.0.312"
+langchain-experimental = "^0.0.31"
+pythonnet = "^3.0.3"
+
+[tool.poetry.scripts]
+selfrepair = "src.main:main"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
